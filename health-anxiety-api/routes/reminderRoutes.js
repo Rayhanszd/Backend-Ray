@@ -4,7 +4,7 @@ import {
   createReminder,
   updateReminder,
   deleteReminder,
-  markTaken
+  markMedicineTaken,
 } from "../controllers/reminderController.js";
 
 const router = express.Router();
@@ -13,6 +13,6 @@ router.get("/:userId", getReminders);
 router.post("/:userId", createReminder);
 router.put("/:reminderId", updateReminder);
 router.delete("/:reminderId", deleteReminder);
-router.post("/:reminderId/taken", markTaken);
+router.post("/:reminderId/taken", markMedicineTaken);
 
 export default router;

@@ -1,15 +1,20 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { createUser, findUserByMobile } from "../models/userModel.js";
+import { createUser, findUserByUsername } from "../models/userModel.js";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// Register 
-
+// Register
 export const register = (req, res) => {
   const data = req.body;
-  if (!data.fullName || !data.mobile || !data.password) {
+  if (
+    !data.fullName ||
+    !data.username ||
+    !data.password ||
+    !data.email ||
+    !data.gender
+  ) {
     return res.status(400).json({
       error: {
         code: "VALIDATION_ERROR",
@@ -18,10 +23,11 @@ export const register = (req, res) => {
     });
   }
 
-  findUserByMobile(data.mobile, async (err, user) => {
+  // Check if user exists by username
+  findUserByUsername(data.username, async (err, user) => {
     if (user) {
       return res.status(400).json({
-        error: { code: "USER_EXISTS", message: "User already registered" },
+        error: { code: "USER_EXISTS", message: "Username already registered" },
       });
     }
 
@@ -29,22 +35,20 @@ export const register = (req, res) => {
     data.password = hashedPassword;
 
     createUser(data, (err, newUser) => {
-      if (err) return res.status(500).json({ error: err.message });
-
-      const token = jwt.sign(
-        { id: newUser.id, mobile: newUser.mobile },
-        process.env.ACCESS_SECRET_KEY,
-        { expiresIn: "1h" }
-      );
-
+      if (err) {
+        console.error("Error creating user:", err);
+        return res.status(500).json({
+          error: { code: "SERVER_ERROR", message: "Failed to create user" },
+        });
+      }
       res.status(201).json({
-        token,
+        message: "User registered successfully",
         user: {
           id: newUser.id,
           fullName: newUser.fullName,
+          username: newUser.username,
+          email: newUser.email,
           gender: newUser.gender,
-          dob: newUser.dob,
-          mobile: newUser.mobile,
         },
       });
     });
@@ -52,19 +56,18 @@ export const register = (req, res) => {
 };
 
 // Login
-
 export const login = (req, res) => {
-  const { mobile, password } = req.body;
-  if (!mobile || !password) {
+  const { username, password } = req.body;
+  if (!username || !password) {
     return res.status(400).json({
       error: {
         code: "VALIDATION_ERROR",
-        message: "Missing mobile or password",
+        message: "Missing username or password",
       },
     });
   }
 
-  findUserByMobile(mobile, async (err, user) => {
+  findUserByUsername(username, async (err, user) => {
     if (!user) {
       return res.status(400).json({
         error: { code: "INVALID_CREDENTIALS", message: "User not found" },
@@ -79,7 +82,7 @@ export const login = (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, mobile: user.mobile },
+      { id: user.id, username: user.username },
       process.env.ACCESS_SECRET_KEY,
       { expiresIn: "1h" }
     );
@@ -91,30 +94,17 @@ export const login = (req, res) => {
         fullName: user.name,
         gender: user.gender,
         dob: user.dob || null,
-        mobile: user.username,
+        username: user.username,
       },
     });
   });
 };
 
 // Logout
-
 export const logoutUser = (req, res) => {
-  try {
-    // Kalau nanti kamu pakai token blacklist, bisa disimpan di DB di sini
-    // Misalnya: insert token ke tabel revoked_tokens
-    return res.status(204).send(); // Sesuai Swagger: No Content
-  } catch (error) {
-    res.status(500).json({
-      error: {
-        code: "SERVER_ERROR",
-        message: "Logout failed.",
-        details: error.message
-      }
-    });
-  }
+  res.status(200).json({ message: "Logged out successfully" });
 };
 
 export const logout = (req, res) => {
-  res.status(204).send();
+  res.status(200).json({ message: "Logged out successfully" });
 };

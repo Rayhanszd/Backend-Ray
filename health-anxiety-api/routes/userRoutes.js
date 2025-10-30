@@ -1,9 +1,13 @@
 import express from "express";
-import { getUserProfile, updateUserProfile, uploadProfilePhoto } from "../controllers/userController.js";
+import {
+  getUserProfile,
+  updateUserProfile,
+  uploadProfilePhoto,
+} from "../controllers/userController.js";
 import fs from "fs";
 import path from "path";
 import multer from "multer";
-
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -18,6 +22,12 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
+// Get user profile
+router.get("/profile", authMiddleware, getUserProfile);
+
+// Update user profile
+router.put("/profile", authMiddleware, updateUserProfile);
+
 // GET /user/profile/:userId
 router.get("/profile/:userId", getUserProfile);
 
@@ -25,6 +35,10 @@ router.get("/profile/:userId", getUserProfile);
 router.put("/profile/:userId", updateUserProfile);
 
 // POST /user/profile/photo/:userId
-router.post("/profile/photo/:userId", upload.single("file"), uploadProfilePhoto);
+router.post(
+  "/profile/photo/:userId",
+  upload.single("file"),
+  uploadProfilePhoto
+);
 
 export default router;

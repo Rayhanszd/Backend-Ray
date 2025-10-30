@@ -17,7 +17,7 @@ export const createUser = (userData, callback) => {
   const values = [
     userData.fullName,
     gender === "Other" ? "Male" : gender,
-    userData.mobile,
+    userData.username,
     userData.email,
     userData.password,
     2, // role_id = 2 (regular user)
@@ -32,9 +32,9 @@ export const createUser = (userData, callback) => {
   });
 };
 
-export const findUserByMobile = (mobile, callback) => {
+export const findUserByUsername = (username, callback) => {
   const sql = "SELECT * FROM ms_users WHERE username = ?";
-  db.query(sql, [mobile], (err, results) => {
+  db.query(sql, [username], (err, results) => {
     if (err) return callback(err);
     callback(null, results[0]);
   });

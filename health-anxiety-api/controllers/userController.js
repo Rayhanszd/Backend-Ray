@@ -1,36 +1,57 @@
 import db from "../config/db.js";
-import path from "path";
-import bcrypt from "bcryptjs";
 
-
-// GET user profile
 export const getUserProfile = (req, res) => {
-  const { userId } = req.params;
-  const sql = "SELECT id, name AS fullName, gender, username AS mobile, email, '' AS photoUrl FROM ms_users WHERE id = ?";
+  const userId = req.user.id; // Assuming you have auth middleware that sets req.user
+
+  const sql =
+    "SELECT id, name, gender, username, email, role_id, created_at FROM ms_users WHERE id = ?";
 
   db.query(sql, [userId], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (results.length === 0) return res.status(404).json({ error: "User not found" });
-    res.status(200).json(results[0]);
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({
+        error: { code: "SERVER_ERROR", message: "Failed to fetch user data" },
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        error: { code: "USER_NOT_FOUND", message: "User not found" },
+      });
+    }
+
+    const user = results[0];
+    res.status(200).json({
+      id: user.id,
+      fullName: user.name,
+      username: user.username,
+      email: user.email,
+      gender: user.gender,
+      roleId: user.role_id,
+      createdAt: user.created_at,
+    });
   });
 };
 
-// UPDATE user profile
 export const updateUserProfile = async (req, res) => {
   const { userId } = req.params;
   const {
-    fullName,     // map ke kolom nama
+    fullName, // map ke kolom nama
     gender,
-    mobile,       // map ke kolom username
+    username, // map ke kolom username
     email,
-    password
+    password,
   } = req.body;
 
   try {
     // 1) Cek apakah user ada
-    const [rows] = await db.promise().query("SELECT * FROM ms_users WHERE id = ? LIMIT 1", [userId]);
+    const [rows] = await db
+      .promise()
+      .query("SELECT * FROM ms_users WHERE id = ? LIMIT 1", [userId]);
     if (!rows || rows.length === 0) {
-      return res.status(404).json({ error: { code: "NOT_FOUND", message: "User not found" } });
+      return res
+        .status(404)
+        .json({ error: { code: "NOT_FOUND", message: "User not found" } });
     }
 
     // 2) Bangun query update dinamis (hanya field yang dikirim)
@@ -45,9 +66,9 @@ export const updateUserProfile = async (req, res) => {
       fields.push("gender = ?");
       values.push(gender);
     }
-    if (mobile !== undefined) {
+    if (username !== undefined) {
       fields.push("username = ?");
-      values.push(mobile);
+      values.push(username);
     }
     if (email !== undefined) {
       fields.push("email = ?");
@@ -61,10 +82,12 @@ export const updateUserProfile = async (req, res) => {
 
     // Jika tidak ada field yang diupdate
     if (fields.length === 0) {
-      const [fresh] = await db.promise().query(
-        "SELECT id, name, gender, username, email FROM ms_users WHERE id = ? LIMIT 1",
-        [userId]
-      );
+      const [fresh] = await db
+        .promise()
+        .query(
+          "SELECT id, name, gender, username, email FROM ms_users WHERE id = ? LIMIT 1",
+          [userId]
+        );
       return res.status(200).json(mapUserRowToResponse(fresh[0]));
     }
 
@@ -77,18 +100,23 @@ export const updateUserProfile = async (req, res) => {
     await db.promise().query(sql, values);
 
     // Ambil data terbaru
-    const [updatedRows] = await db.promise().query(
-      "SELECT id, name, gender, username, email FROM ms_users WHERE id = ? LIMIT 1",
-      [userId]
-    );
+    const [updatedRows] = await db
+      .promise()
+      .query(
+        "SELECT id, name, gender, username, email FROM ms_users WHERE id = ? LIMIT 1",
+        [userId]
+      );
 
     const userResp = mapUserRowToResponse(updatedRows[0]);
     return res.status(200).json(userResp);
-
   } catch (err) {
     console.error(err);
     return res.status(500).json({
-      error: { code: "DB_ERROR", message: "Database error", details: err.message }
+      error: {
+        code: "DB_ERROR",
+        message: "Database error",
+        details: err.message,
+      },
     });
   }
 };
@@ -98,9 +126,9 @@ const mapUserRowToResponse = (row) => ({
   id: row.id.toString(),
   fullName: row.name,
   gender: row.gender,
-  mobile: row.username,
+  username: row.username,
   email: row.email,
-  photoUrl: `https://cdn.example.com/profiles/${row.id}.jpg`
+  photoUrl: `https://cdn.example.com/profiles/${row.id}.jpg`,
 });
 
 // UPLOAD profile photo
