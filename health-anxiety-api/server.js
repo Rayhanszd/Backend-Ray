@@ -8,8 +8,6 @@ import testRoutes from "./routes/testRoutes.js";
 import reminderRoutes from "./routes/reminderRoutes.js";
 import therapyRoutes from "./routes/therapyRoutes.js";
 
-
-
 import "./config/db.js";
 
 dotenv.config();

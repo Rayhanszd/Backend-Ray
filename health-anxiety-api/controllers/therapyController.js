@@ -66,16 +66,18 @@ export const getVideoContent = (req, res) => {
   });
 };
 
-// 📘 3️⃣ GET /therapy/ebooks — daftar ebook
+// 📘 GET /therapy/ebooks — daftar ebook
 export const getEbooks = (req, res) => {
   const sql = `
     SELECT 
-      id, 
-      title_en AS title, 
-      created_by AS author, 
-      image_url AS coverUrl
+      id,
+      title_en AS title,
+      created_by AS author,
+      image_url AS coverUrl,
+      article_url AS pdfUrl
     FROM ms_therapy_material
-    WHERE LOWER(type) = 'ebook'
+    WHERE article_url IS NOT NULL
+      AND article_url LIKE '%.pdf%'
   `;
 
   db.query(sql, (err, results) => {
@@ -84,11 +86,11 @@ export const getEbooks = (req, res) => {
       return res.status(500).json({ error: "Failed to fetch ebooks" });
     }
 
-    const formatted = results.map(e => ({
-      id: e.id,
+    const formatted = results.map((e) => ({
+      id: `e_${String(e.id).padStart(2, "0")}`, // ubah id jadi e_01, e_02, dst.
       title: e.title,
-      author: e.author || "Unknown",
-      coverUrl: e.coverUrl
+      author: e.author || "H. Wardana, M.Psi.", // default sesuai Swagger
+      coverUrl: e.coverUrl,
     }));
 
     res.status(200).json(formatted);
@@ -96,23 +98,29 @@ export const getEbooks = (req, res) => {
 };
 
 
-// 📕 4️⃣ GET /therapy/ebooks/:ebookId — detail ebook
+
+// 📕 GET /therapy/ebooks/:ebookId — detail ebook
 export const getEbookContent = (req, res) => {
   const { ebookId } = req.params;
 
+  // Ambil hanya angka dari id seperti e_01 → 1
+  const numericId = ebookId.replace("e_", "");
+
   const sql = `
     SELECT 
-      id, 
-      title_en AS title, 
-      created_by AS author, 
-      image_url AS coverUrl, 
-      article_url AS pdfUrl, 
-      description_en AS description
+      id,
+      title_en AS title,
+      description_en AS description,
+      created_by AS author,
+      image_url AS coverUrl,
+      article_url AS pdfUrl
     FROM ms_therapy_material
-    WHERE id = ? AND type = 'ebook'
+    WHERE id = ?
+      AND article_url IS NOT NULL
+      AND article_url LIKE '%.pdf%'
   `;
 
-  db.query(sql, [ebookId], (err, results) => {
+  db.query(sql, [numericId], (err, results) => {
     if (err) {
       console.error("❌ Error fetching ebook content:", err);
       return res.status(500).json({ error: "Failed to fetch ebook content" });
@@ -123,15 +131,17 @@ export const getEbookContent = (req, res) => {
 
     const e = results[0];
     res.status(200).json({
-      id: e.id,
+      id: `e_${String(e.id).padStart(2, "0")}`,
       title: e.title,
-      author: e.author || "Unknown",
+      author: e.author || "H. Wardana, M.Psi.",
       coverUrl: e.coverUrl,
-      description: e.description,
-      pdfUrl: e.pdfUrl
+      description: e.description || "Exercises and worksheets for CBT practice.",
+      pdfUrl: e.pdfUrl,
     });
   });
 };
+
+
 
 // 💬 5️⃣ GET /therapy/chat/history — riwayat chat
 export const getChatHistory = (req, res) => {
