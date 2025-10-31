@@ -8,8 +8,6 @@ const db = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  // FIX: Add the port and parse it as a number
-  port: parseInt(process.env.DB_PORT, 10),
 });
 
 db.connect((err) => {
