@@ -9,6 +9,8 @@ import {
 
 const router = express.Router();
 
+//========= GLOBAL ==========
+
 router.get("/:userId", getReminders);
 router.post("/:userId", createReminder);
 router.put("/:reminderId", updateReminder);

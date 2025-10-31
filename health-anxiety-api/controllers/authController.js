@@ -5,6 +5,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+
+// ============= GLOBAL ROUTES ============= //
+
+
 // POST /auth/register
 
 export const register = (req, res) => {

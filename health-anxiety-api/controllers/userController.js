@@ -2,6 +2,10 @@ import db from "../config/db.js";
 import path from "path";
 import bcrypt from "bcryptjs";
 
+
+// ============= GLOBAL ROUTES ============= //
+
+
 // GET /user/profile/:userId
 
 export const getUserProfile = (req, res) => {

@@ -8,6 +8,8 @@ import {
 
 const router = express.Router();
 
+//========= GLOBAL ==========
+
 router.get("/questions", getQuestions);
 router.post("/submit", submitTest);
 router.get("/results/:testId", getTestResult);

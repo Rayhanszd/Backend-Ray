@@ -18,6 +18,8 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
+//========= GLOBAL ==========
+
 router.get("/profile/:userId", getUserProfile);
 router.put("/profile/:userId", updateUserProfile);
 router.post("/profile/photo/:userId", upload.single("file"), uploadProfilePhoto);

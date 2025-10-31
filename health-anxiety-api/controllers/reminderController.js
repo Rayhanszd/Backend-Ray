@@ -1,5 +1,9 @@
 import db from "../config/db.js";
 
+
+// ============= GLOBAL ROUTES ============= //
+
+
 // GET /reminder/:userId
 
 export const getReminders = (req, res) => {

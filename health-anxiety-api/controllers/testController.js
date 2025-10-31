@@ -1,6 +1,10 @@
 import db from "../config/db.js";
 import { v4 as uuidv4 } from "uuid";
 
+
+// ============= GLOBAL ROUTES ============= //
+
+
 // GET /test/questions
 
 export const getQuestions = (req, res) => {

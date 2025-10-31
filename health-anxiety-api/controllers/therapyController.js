@@ -1,5 +1,9 @@
 import db from "../config/db.js";
 
+
+// ============= GLOBAL ROUTES ============= //
+
+
 // GET /therapy/videos
 
 export const getVideoSections = (req, res) => {

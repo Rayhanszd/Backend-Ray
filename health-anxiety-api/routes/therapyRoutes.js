@@ -10,6 +10,8 @@ import {
 
 const router = express.Router();
 
+//========= GLOBAL ==========
+
 router.get("/videos", getVideoSections);
 router.get("/videos/:sectionId", getVideoContent);
 router.get("/ebooks", getEbooks);
