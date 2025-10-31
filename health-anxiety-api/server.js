@@ -13,7 +13,6 @@ import "./config/db.js";
 dotenv.config();
 const app = express();
 
-// ✅ agar body JSON bisa dibaca
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -26,6 +25,14 @@ app.use("/uploads", express.static("uploads"));
 app.use("/test", testRoutes);
 app.use("/reminders", reminderRoutes);
 app.use("/therapy", therapyRoutes);
+
+// ========= FRONTEND ==========
+
+app.use("/FE", authRoutes)
+app.use("/FE/user", userRoutes)
+app.use("/FE/test", testRoutes)
+app.use("/FE/reminders", reminderRoutes)
+app.use("/FE/therapy", therapyRoutes)
 
 
 

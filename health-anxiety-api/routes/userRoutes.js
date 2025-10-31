@@ -18,13 +18,14 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-// GET /user/profile/:userId
 router.get("/profile/:userId", getUserProfile);
-
-// PUT /user/profile/:userId
 router.put("/profile/:userId", updateUserProfile);
-
-// POST /user/profile/photo/:userId
 router.post("/profile/photo/:userId", upload.single("file"), uploadProfilePhoto);
+
+// ========= FRONTEND ==========
+
+router.get("/FE/profile/:userId", getUserProfile);
+router.put("/FE/profile/:userId", updateUserProfile);
+router.post("/FE/profile/photo/:userId", upload.single("file"), uploadProfilePhoto);
 
 export default router;

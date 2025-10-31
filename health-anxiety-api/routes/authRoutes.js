@@ -7,4 +7,10 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", logout);
 
+// ========= FRONTEND ==========
+
+router.post("/FE/register", register);
+router.post("/FE/login", login);
+router.post("/FE/logout", logout);
+
 export default router;

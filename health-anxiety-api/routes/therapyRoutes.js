@@ -17,4 +17,13 @@ router.get("/ebooks/:ebookId", getEbookContent);
 router.get("/chat/history", getChatHistory);
 router.post("/chat/send", sendChatMessage);
 
+// ========= FRONTEND ==========
+
+router.get("/FE/videos", getVideoSections);
+router.get("/FE/videos/:sectionId", getVideoContent);
+router.get("/FE/ebooks", getEbooks);
+router.get("/FE/ebooks/:ebookId", getEbookContent);
+router.get("/FE/chat/history", getChatHistory);
+router.post("/FE/chat/send", sendChatMessage);
+
 export default router;

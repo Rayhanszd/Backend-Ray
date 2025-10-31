@@ -13,4 +13,10 @@ router.post("/submit", submitTest);
 router.get("/results/:testId", getTestResult);
 router.get("/history", getTestHistory);
 
+// ========= FRONTEND ==========
+router.get("/FE/test/questions", getQuestions);
+router.post("/FE/test/submit", submitTest);
+router.get("/FE/test/results/:testId", getTestResult);
+router.get("/FE/test/history", getTestHistory);
+
 export default router;
