@@ -3,23 +3,31 @@ import { v4 as uuidv4 } from "uuid";
 
 export const createUser = (userData, callback) => {
   const id = "u_" + uuidv4().split("-")[0];
+
+  // Capitalize first letter of gender to match enum('Male', 'Female')
+  const gender =
+    userData.gender.charAt(0).toUpperCase() +
+    userData.gender.slice(1).toLowerCase();
+
   const sql = `
     INSERT INTO ms_users 
-    (id, name, gender, username, email, password, role_id, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+    (name, gender, username, email, password, role_id, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
   `;
   const values = [
-    id,
-    userData.fullName, // ambil dari body tapi simpan ke kolom 'nama'
-    userData.gender,
-    userData.mobile,   // kita gunakan mobile sebagai username
-    userData.email || `${userData.mobile}@example.com`, // fallback jika tidak ada email
+    userData.fullName,
+    gender === "Other" ? "Male" : gender,
+    userData.mobile,
+    userData.email,
     userData.password,
-    2 // default role_id = 2 (misalnya user biasa)
+    2, // role_id = 2 (regular user)
   ];
 
   db.query(sql, values, (err, result) => {
-    if (err) return callback(err);
+    if (err) {
+      console.error("Database error:", err);
+      return callback(err);
+    }
     callback(null, { id, ...userData });
   });
 };
@@ -31,4 +39,3 @@ export const findUserByMobile = (mobile, callback) => {
     callback(null, results[0]);
   });
 };
-
